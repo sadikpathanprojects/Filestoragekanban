@@ -74,7 +74,8 @@
   <h1>Kanban Board (Hybrid Storage)</h1>
 
   <div class="controls">
-    <input type="text" id="taskInput" placeholder="New Task">
+    <input type="text" id="taskInput" placeholder="New Task"
+           onkeypress="handleKeyPress(event)">
     <button onclick="addTask()">Add to To-Do</button>
     <button onclick="exportBoard()">Export JSON</button>
     <input type="file" id="fileInput" onchange="importBoard(event)">
@@ -112,6 +113,12 @@
       saveBoard();
     }
 
+    function handleKeyPress(event) {
+      if (event.key === "Enter") {
+        addTask();
+      }
+    }
+
     function createTaskElement(text) {
       const task = document.createElement("div");
       task.className = "task";
@@ -133,7 +140,7 @@
       ev.preventDefault();
       if (dragged) {
         if (ev.currentTarget.id === "dustbin") {
-          dragged.remove(); // delete task if dropped in dustbin
+          dragged.remove();
         } else {
           ev.currentTarget.appendChild(dragged);
         }
@@ -204,7 +211,6 @@
       });
     }
 
-    // Load saved board on startup
     window.onload = loadBoard;
   </script>
 </body>
