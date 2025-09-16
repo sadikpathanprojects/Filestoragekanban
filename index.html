@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Kanban Board (File Storage + Dustbin)</title>
+  <title>Kanban Board (Hybrid Storage)</title>
   <style>
     body {
       margin: 0;
@@ -25,7 +25,7 @@
       background: #2e2e2e;
       padding: 10px;
       border-radius: 10px;
-      width: 200px;
+      width: 220px;
       min-height: 300px;
     }
     .column h2 {
@@ -42,14 +42,22 @@
     .controls {
       margin: 15px;
     }
+    #taskInput {
+      width: 250px;
+      padding: 8px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: none;
+    }
     button {
       margin: 5px;
-      padding: 6px 12px;
+      padding: 8px 14px;
       border: none;
       border-radius: 5px;
       background: #4cafef;
       color: white;
       cursor: pointer;
+      font-size: 14px;
     }
     button:hover {
       background: #45a0e0;
@@ -63,7 +71,7 @@
   </style>
 </head>
 <body>
-  <h1>Kanban Board (File Storage + Dustbin)</h1>
+  <h1>Kanban Board (Hybrid Storage)</h1>
 
   <div class="controls">
     <input type="text" id="taskInput" placeholder="New Task">
@@ -101,6 +109,7 @@
       const task = createTaskElement(taskText);
       document.getElementById("todo").appendChild(task);
       input.value = "";
+      saveBoard();
     }
 
     function createTaskElement(text) {
@@ -128,6 +137,30 @@
         } else {
           ev.currentTarget.appendChild(dragged);
         }
+        saveBoard();
+      }
+    }
+
+    function getTasks(columnId) {
+      return Array.from(document.getElementById(columnId).querySelectorAll(".task"))
+                  .map(task => task.textContent);
+    }
+
+    function saveBoard() {
+      const boardData = {
+        todo: getTasks("todo"),
+        inprogress: getTasks("inprogress"),
+        onhold: getTasks("onhold"),
+        completed: getTasks("completed"),
+        dustbin: getTasks("dustbin"),
+      };
+      localStorage.setItem("kanbanBoard", JSON.stringify(boardData));
+    }
+
+    function loadBoard() {
+      const saved = localStorage.getItem("kanbanBoard");
+      if (saved) {
+        restoreBoard(JSON.parse(saved));
       }
     }
 
@@ -155,13 +188,9 @@
       reader.onload = function(e) {
         const data = JSON.parse(e.target.result);
         restoreBoard(data);
+        saveBoard();
       };
       reader.readAsText(file);
-    }
-
-    function getTasks(columnId) {
-      return Array.from(document.getElementById(columnId).querySelectorAll(".task"))
-                  .map(task => task.textContent);
     }
 
     function restoreBoard(data) {
@@ -174,6 +203,9 @@
         });
       });
     }
+
+    // Load saved board on startup
+    window.onload = loadBoard;
   </script>
 </body>
 </html>
