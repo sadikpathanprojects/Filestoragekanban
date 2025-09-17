@@ -39,6 +39,10 @@
       border-radius: 5px;
       cursor: grab;
     }
+    .task[contenteditable="true"] {
+      outline: 2px solid #4cafef;
+      cursor: text;
+    }
     .controls {
       margin: 15px;
     }
@@ -98,7 +102,8 @@
       <h2>🗑 Dustbin</h2>
     </div>
   </div>
-<div class="footer">Created by Sadik Pathan</div>
+  <div class="footer">Created by Sadik Pathan</div>
+
   <script>
     let dragged = null;
 
@@ -125,6 +130,25 @@
       task.textContent = text;
       task.draggable = true;
       task.ondragstart = drag;
+
+      // Enable in-place editing on double-click
+      task.ondblclick = () => {
+        task.contentEditable = true;
+        task.focus();
+      };
+
+      // Save changes on blur or Enter key
+      task.onblur = () => {
+        task.contentEditable = false;
+        saveBoard();
+      };
+      task.onkeypress = (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault(); // prevent newline
+          task.blur();
+        }
+      };
+
       return task;
     }
 
